@@ -40,7 +40,7 @@ pipeline {
 
         stage("SonarQube Analysis") {
             steps {
-                script {
+                script { // Changed this block
                     withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token') { 
                         sh "mvn sonar:sonar"
                     }
@@ -50,7 +50,7 @@ pipeline {
 
         stage("Quality Gate") {
             steps {
-                script {
+                script { // Changed this block
                     waitForQualityGate abortPipeline: false, credentialsId: 'jenkins-sonarqube-token'
                 }    
             }
@@ -58,7 +58,7 @@ pipeline {
 
         stage("Build & Push Docker Image") {
             steps {
-                script {
+                script { // Changed this block
                     docker.withRegistry('', DOCKER_PASS) {
                         docker_image = docker.build "${IMAGE_NAME}"
                     }
@@ -73,7 +73,7 @@ pipeline {
 
         stage("Trivy Scan") {
             steps {
-                script {
+                script { // Changed this block
                     sh ('docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image ashfaque9x/register-app-pipeline:latest --no-progress --scanners vuln --exit-code 0 --severity HIGH,CRITICAL --format table')
                 }
             }
@@ -81,7 +81,7 @@ pipeline {
 
         stage('Cleanup Artifacts') {
             steps {
-                script {
+                script { // Changed this block
                     sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG}"
                     sh "docker rmi ${IMAGE_NAME}:latest"
                 }
@@ -90,7 +90,7 @@ pipeline {
 
         stage("Trigger CD Pipeline") {
             steps {
-                script {
+                script { // Changed this block
                     // Temporarily commented out for testing due to missing JENKINS_API_TOKEN
                     // sh "curl -v -k --user clouduser:${JENKINS_API_TOKEN} -X POST -H 'cache-control: no-cache' -H 'content-type: application/x-www-form-urlencoded' --data 'IMAGE_TAG=${IMAGE_TAG}' 'ec2-13-232-128-192.ap-south-1.compute.amazonaws.com:8080/job/gitops-register-app-cd/buildWithParameters?token=gitops-token'"
                 }
@@ -111,3 +111,4 @@ pipeline {
         }      
     }
 }
+
